@@ -4,9 +4,8 @@ namespace App\Services\Base;
 
 use Illuminate\Support\Facades\Http;
 
-use App\Helpers\Helper;
-
-class ApiService{
+class ApiService
+{
 
     protected $credentials;
 
@@ -22,35 +21,30 @@ class ApiService{
      *
      * @throw Exception
      *
-    */
+     */
 
-    public function requestTo(string $method , string $url , $data = [] , bool $json = false){
+    public function requestTo(string $method, string $url, $data = [], bool $json = false)
+    {
 
-        if(!$this->credentials) throw new Exception('Protected credentials will be initialized');
+        if (!$this->credentials) throw new Exception('Protected credentials will be initialized');
 
-        if(!isset($this->credentials['api_path'])) throw new Exception('api_path Key is important');
+        if (!isset($this->credentials['api_path'])) throw new Exception('api_path Key is important');
 
-        if(!in_array($method , ['get' , 'post','put' , 'delete'])) throw new Exception('$method will be (get|post|put|delete)');
+        if (!in_array($method, ['get', 'post', 'put', 'delete'])) throw new Exception('$method will be (get|post|put|delete)');
 
         $url_data = [
             $this->credentials['api_path'],
             $url
         ];
-//        $url = Helper::concatForUrls($url_data);
-//        dd($url);
 
-        if(isset($this->credentials['key_after'])){
-            $url .= $this->credentials['key'];
-        }
-        dd($url);
-        $res = Http::$method($this->credentials['url']  , $data);
+        $url = concatForUrls($url_data);
 
-        if($json){
+        $res = Http::$method($url, $data);
+
+        if ($json) {
             return $res->json();
         }
 
         return $res->body();
     }
-
-
 }

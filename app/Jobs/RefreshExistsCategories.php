@@ -9,6 +9,11 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
+
+use App\Services\OddService;
+
+// use App\Se
+
 class RefreshExistsCategories implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -20,7 +25,7 @@ class RefreshExistsCategories implements ShouldQueue
      */
     public function __construct()
     {
-        //
+        // 
     }
 
     /**
@@ -30,6 +35,15 @@ class RefreshExistsCategories implements ShouldQueue
      */
     public function handle()
     {
-
+        $odd_service = new OddService(config('services.odd'));
+        $all_types =  $odd_service->updateSportTypes();
+        if ($all_types['success']) {
+            \Log::info('M<olodes');
+        } else {
+            \Log::info('Cron Job RefreshExists has error');
+            if (isset($all_types['message'])) {
+                \Log::info($all_types['message']);
+            }
+        }
     }
 }

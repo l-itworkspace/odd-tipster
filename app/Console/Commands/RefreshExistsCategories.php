@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
+use App\Jobs\RefreshExistsCategories as JobRefreshExistsCategories;
+
 class RefreshExistsCategories extends Command
 {
     /**
@@ -37,6 +39,6 @@ class RefreshExistsCategories extends Command
      */
     public function handle()
     {
-        RefreshExistsCategories::dispatch();
+        JobRefreshExistsCategories::dispatch();
     }
 }
