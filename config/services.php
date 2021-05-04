@@ -31,7 +31,7 @@ return [
     ],
 
     'odd' => [
-        'key' => 'bb604b302db9e801ac7d4f30f43922cf',
+        'key' => '950ee564b288a68ad4c893f6b544b091',
         'api_path' => 'https://api.the-odds-api.com/v3/',
     ]
 

@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\RefreshExistsCategories::class
+//        Commands\RefreshExistsCategories::class
     ];
 
     /**
@@ -24,6 +24,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->command('refresh:categories')->cron('0 0 12 ? * MON,WED,FRI,SUN *');
+        $schedule->command('refresh:matches')->everyFiveMinutes();
         // $schedule->command('inspire')->hourly();
     }
 

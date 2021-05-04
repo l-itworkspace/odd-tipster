@@ -13,8 +13,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [App\Http\Controllers\HomeController::class , 'home']);
 
 Auth::routes();
+
+Route::get('/', [App\Http\Controllers\HomeController::class , 'home']);
+Route::get('/get-odds' , [App\Http\Controllers\HomeController::class , 'getOdds']);
+
+
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

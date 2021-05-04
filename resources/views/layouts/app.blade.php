@@ -10,7 +10,7 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    <script src="{{ asset('js/app.js') }}"></script>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -18,6 +18,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
 </head>
 <body>
     <div id="app">
@@ -76,8 +77,42 @@
         </nav>
 
         <main class="py-4">
-            @yield('content')
+            <div class="container">
+
+
+                @if(isset($sport_types))
+                    <div class="row">
+
+                        <div class="col-md-3">
+
+                            <div class="list-group">
+                                @php
+                                    $request_sport_type = \Request::get('sport_type');
+                                @endphp
+                                @foreach($sport_types as $k =>$sport_type)
+                                    <a class="list-group-item {{ $request_sport_type === $sport_type->type ? 'active' : '' }}" href="{{  url('/' ) . '?' . http_build_query(['sport_type' => $sport_type->type]) }}" >
+                                        <span>{{ $sport_type->details  }}</span>
+                                    </a>
+                                @endforeach
+                                @if(!count($sport_types))
+                                    <a class="list-group-item"><span>Sorry ..</span></a>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            @yield('content')
+                        </div>
+                    </div>
+                @else
+                    <div>
+                        @yield('content')
+                    </div>
+                @endif
+            </div>
         </main>
     </div>
+    {{--  This files will be mixed with all jses  --}}
+    <script src="{{asset('js/script.js')}}"></script>
+    @yield('script')
 </body>
 </html>
