@@ -92,8 +92,14 @@ class OddService extends ApiService
         }
 
        if ((isset($get_all['db']) && $get_all['db']) || !$get_all) {
+           $selects = ['*'];
 
-           $matches =  Match::query();
+           if(isset($get_all['db']['select'])){
+               $selects = $get_all['db']['select'];
+           }
+
+           $matches = Match::select($selects);
+
            if(isset($get_all['db']['where'])){
                $matches->where($get_all['db']['where']);
            }
@@ -117,13 +123,9 @@ class OddService extends ApiService
                $matches->where('sport_type' , $sport_type);
            }
 
-           $selects = ['*'];
 
-           if(isset($get_all['db']['select'])){
-               $selects = $get_all['db']['select'];
-           }
 
-           $matches_response['db'] = $matches->select($selects)->paginate(20)->appends(\Request::all());
+           $matches_response['db'] = $matches->paginate(20)->appends(\Request::all());
        }
 
         if($get_all){
