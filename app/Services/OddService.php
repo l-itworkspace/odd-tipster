@@ -98,7 +98,7 @@ class OddService extends ApiService
                $selects = $get_all['db']['select'];
            }
 
-           $matches = Match::select($selects);
+           $matches = \App\Models\Match::select($selects);
 
            if(isset($get_all['db']['where'])){
                $matches->where($get_all['db']['where']);
