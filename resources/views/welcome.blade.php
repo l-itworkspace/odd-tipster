@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title') Odds Tipster @endsection
+
 @section('content')
     <div class="card">
         <div class="card-header">
