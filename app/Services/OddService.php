@@ -26,7 +26,7 @@ class OddService extends ApiService
         }
 
         if ((isset($get_all['db']) && $get_all['db']) || !$get_all) {
-            $types_response['db'] = SportTypes::where('active', 1)->get($select);
+            $types_response['db'] = \App\Models\SportTypes::where('active', 1)->get($select);
         }
 
         if ($get_all) {
@@ -59,7 +59,7 @@ class OddService extends ApiService
 
             if (isset($ex_types)) {
                 try {
-                    SportTypes::where('type', trim($type_api['key']))->update($insert_or_update);
+                    \App\Models\SportTypes::where('type', trim($type_api['key']))->update($insert_or_update);
                 } catch (\Exception $e) {
                     return ['success' => false, 'message' => $e->getMessage()];
                 }
@@ -70,7 +70,7 @@ class OddService extends ApiService
         }
 
         if ($insert_into) {
-            return ['success' => SportTypes::insert($insert_into)];
+            return ['success' => \App\Models\SportTypes::insert($insert_into)];
         }
         return ['success' => true];
     }
@@ -220,8 +220,8 @@ class OddService extends ApiService
 
             }
 
-            if(Match::insert($inserts)){
-                $insert_ids = Match::whereIn('provider_id' ,$provider_ids )->get(['id' , 'provider_id'])->toArray();
+            if(\App\Models\Match::insert($inserts)){
+                $insert_ids = \App\Models\Match::whereIn('provider_id' ,$provider_ids )->get(['id' , 'provider_id'])->toArray();
                 $insert_odds = [];
                 foreach ($odds as $o_key => $odd){
                     foreach ($insert_ids as $i_key => $insert_data){
@@ -233,7 +233,7 @@ class OddService extends ApiService
                         }
                     }
                 }
-                if(!Odd::insert($insert_odds)){
+                if(!\App\Models\Odd::insert($insert_odds)){
                     \Log::info('asdas');
                     die;
                 };
@@ -245,7 +245,7 @@ class OddService extends ApiService
 
 
     public function getOddsByMatchId($id , array $where = []){
-        $odds = Odd::where('match_id' , $id );
+        $odds = \App\Models\Odd::where('match_id' , $id );
         if($where){
             $odds->where($where);
         }
