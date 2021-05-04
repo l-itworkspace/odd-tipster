@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Match;
 use App\Models\Odd;
 use App\Services\Base\ApiService;
 
@@ -98,7 +97,7 @@ class OddService extends ApiService
                $selects = $get_all['db']['select'];
            }
 
-           $matches = \App\Models\Match::select($selects);
+           $matches = \App\Models\Game::select($selects);
 
            if(isset($get_all['db']['where'])){
                $matches->where($get_all['db']['where']);
@@ -220,8 +219,8 @@ class OddService extends ApiService
 
             }
 
-            if(\App\Models\Match::insert($inserts)){
-                $insert_ids = \App\Models\Match::whereIn('provider_id' ,$provider_ids )->get(['id' , 'provider_id'])->toArray();
+            if(\App\Models\Game::insert($inserts)){
+                $insert_ids = \App\Models\Game::whereIn('provider_id' ,$provider_ids )->get(['id' , 'provider_id'])->toArray();
                 $insert_odds = [];
                 foreach ($odds as $o_key => $odd){
                     foreach ($insert_ids as $i_key => $insert_data){
