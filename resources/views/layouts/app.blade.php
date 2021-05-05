@@ -17,8 +17,10 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://odds-tipster.herokuapp.com/css/app.css">
+    <link rel="stylesheet" href="https://odds-tipster.herokuapp.com/css/style.css">
+{{--    <link href="{{ asset('css/app.css') }}" rel="stylesheet">--}}
+{{--    <link href="{{ asset('css/style.css') }}" rel="stylesheet">--}}
 </head>
 <body>
     <div id="app">
@@ -113,7 +115,9 @@
         </main>
     </div>
     {{--  This files will be mixed with all jses  --}}
-    <script src="{{asset('js/script.js')}}"></script>
+    {{--  The Heroku will be load without https protocol  --}}
+    <script src="https://odds-tipster.herokuapp.com/js/script.js"></script>
+{{--    <script src="{{asset('js/script.js')}}"></script>--}}
     @yield('script')
 </body>
 </html>
