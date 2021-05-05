@@ -10,7 +10,8 @@
     <title>@yield('title')</title>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="https://odds-tipster.herokuapp.com/js/app.js"></script>
+{{--    <script src="{{ asset('js/app.js') }}"></script>--}}
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
