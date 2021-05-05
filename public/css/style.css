@@ -2,5 +2,5 @@
     cursor: pointer;
 }
 .scrollable-x{
-    overflow-x: scroll;
+    overflow-x: auto;
 }
