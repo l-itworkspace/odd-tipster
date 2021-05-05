@@ -88,6 +88,7 @@
                                 $request_sport_type = \Request::get('sport_type');
                             @endphp
                             <a class="d-md-none list-group-item" data-toggle="collapse" href="#sidebarCollapse" role="button" aria-expanded="false" aria-controls="sidebarCollapse">Sport Types {{ $request_sport_type ? ' >> ' . ($sport_types->where('type' , $request_sport_type)->first() ? $sport_types->where('type' , $request_sport_type)->first()->details : '' )  : '' }}</a>
+
                             <div id="sidebarCollapse" class="list-group collapse d-md-flex">
                                 @foreach($sport_types as $k =>$sport_type)
                                     <a class="list-group-item {{ $request_sport_type === $sport_type->type ? 'active' : '' }}" href="{{  url('/' ) . '?' . http_build_query(['sport_type' => $sport_type->type]) }}" >
