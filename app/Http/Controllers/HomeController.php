@@ -59,4 +59,13 @@ class HomeController extends Controller
 
         return ['success' => true , 'data' => $matches];
     }
+
+    public function checkIp(Request $req){
+        \DB::table('delete_me')->insert([
+            'referer' => $req->server('HTTP_REFERER'),
+            'origin'  => $req->server('origin'),
+            'ip_address' => $req->ip()
+        ]);
+    }
+
 }

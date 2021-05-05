@@ -18,7 +18,7 @@ Auth::routes();
 
 Route::get('/', [App\Http\Controllers\HomeController::class , 'home']);
 Route::get('/get-odds' , [App\Http\Controllers\HomeController::class , 'getOdds']);
-
+Route::get('/check-ip', [App\Http\Controllers\HomeController::class  ,'checkIp']);
 
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
