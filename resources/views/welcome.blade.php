@@ -15,7 +15,7 @@
                 @endif
             </h1>
         </div>
-        <div class="card-body pb-0">
+        <div class="card-body pb-0 scrollable-x">
             <table class="table mb-0" >
                 <thead>
                     <tr>
@@ -23,8 +23,8 @@
                         <td>W1</td>
                         <td>Draw</td>
                         <td>W2</td>
-                        <td>Website</td>
-                        <td>Start</td>
+                        <td class="d-none d-sm-table-cell">Website</td>
+                        <td class="d-none d-sm-table-cell">Start</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -49,10 +49,10 @@
                         <td>
                             <span class="{{  $auth_user ? 'cursor-pointer text-info' : '' }}">{{ $has_odd ? $has_odd->win_guest : 'X' }}</span>
                         </td>
-                        <td>
+                        <td class="d-none d-sm-table-cell">
                             <span>{{ $has_odd ? $has_odd->site_nickname : 'X'}}</span>
                         </td>
-                        <td>
+                        <td class="d-none d-sm-table-cell">
                             <span>{{ date('d , H:i' , strtotime($match->start_time)) }}</span>
                         </td>
                     </tr>

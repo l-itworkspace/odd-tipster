@@ -25,7 +25,7 @@ class OddService extends ApiService
         }
 
         if ((isset($get_all['db']) && $get_all['db']) || !$get_all) {
-            $types_response['db'] = \App\Models\SportTypes::where('active', 1)->get($select);
+            $types_response['db'] = \App\Models\SportTypes::where('active', 1)->orderBy('parent_id')->get($select);
         }
 
         if ($get_all) {
@@ -122,8 +122,6 @@ class OddService extends ApiService
                $matches->where('sport_type' , $sport_type);
            }
 
-
-
            $matches_response['db'] = $matches->paginate(20)->appends(\Request::all());
        }
 
@@ -145,8 +143,6 @@ class OddService extends ApiService
         ];
 
         $matches = $this->getMatches(  $datas );
-//        array_unshift($sport_types , ['type' => 'upcoming']);
-
 
         $cr_date = date('Y-m-d H:i:s');
         $delete_me = microtime(true);
@@ -239,7 +235,7 @@ class OddService extends ApiService
             }
 
         }
-
+        \Log::info('Work Time refresh matches' . (microtime(true) - $delete_me));
     }
 
 

@@ -84,11 +84,11 @@
                     <div class="row">
 
                         <div class="col-md-3">
-
-                            <div class="list-group">
-                                @php
-                                    $request_sport_type = \Request::get('sport_type');
-                                @endphp
+                            @php
+                                $request_sport_type = \Request::get('sport_type');
+                            @endphp
+                            <a class="d-md-none list-group-item" data-toggle="collapse" href="#sidebarCollapse" role="button" aria-expanded="false" aria-controls="sidebarCollapse">Sport Types {{ $request_sport_type ? ' >> ' . ($sport_types->where('type' , $request_sport_type)->first() ? $sport_types->where('type' , $request_sport_type)->first()->details : '' )  : '' }}</a>
+                            <div id="sidebarCollapse" class="list-group collapse d-md-flex">
                                 @foreach($sport_types as $k =>$sport_type)
                                     <a class="list-group-item {{ $request_sport_type === $sport_type->type ? 'active' : '' }}" href="{{  url('/' ) . '?' . http_build_query(['sport_type' => $sport_type->type]) }}" >
                                         <span>{{ $sport_type->details  }}</span>
@@ -99,7 +99,7 @@
                                 @endif
                             </div>
                         </div>
-                        <div class="col-md-9">
+                        <div class="col-md-9 mt-3 mt-md-0">
                             @yield('content')
                         </div>
                     </div>

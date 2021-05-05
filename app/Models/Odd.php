@@ -27,4 +27,10 @@ class Odd extends Model
     protected $casts = [
         "last_update" => "date:d , H:i",
     ];
+
+
+    public function Game(){
+        $this->hasOne('App\Models\Game' , 'id' , 'match_id');
+    }
+
 }

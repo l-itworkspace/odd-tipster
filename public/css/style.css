@@ -1,3 +1,6 @@
 .cursor-pointer{
     cursor: pointer;
 }
+.scrollable-x{
+    overflow-x: scroll;
+}
