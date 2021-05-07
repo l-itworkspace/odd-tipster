@@ -160,6 +160,9 @@ class SportTraderService extends ApiService implements OddApiService {
         $this->sport_types = $sport_types;
         $inserts = [];
         $cr_date = date('Y-m-d');
+        if(!isset($sport_types['api'])){
+            return ['success' => false];
+        }
         foreach ($sport_types['api'] as $s_key => $sport_type){
             $insert_or_update = [
                 'provider_slug' => $sport_type['id'],

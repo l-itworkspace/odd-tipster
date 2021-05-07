@@ -38,7 +38,7 @@ return [
     'sport_traders' => [
         'api_path'    => 'https://api.sportradar.com/oddscomparison-rowt1/en/eu/',
         'schedule'    => 'https://schema.sportradar.com/',
-        'api_key'     => 'w7cdhmkgk58vbwa25v47qpbb'
+        'api_key'     => 'vvtrum6ubv3z5xbu4qvqd643'
     ],
 
     'pinnacle' => [
