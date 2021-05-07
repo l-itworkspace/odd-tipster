@@ -326,22 +326,26 @@ class SportTraderService extends ApiService implements OddApiService {
                     }
 
                     if($ex_match = $exists_matches->where('provider_slug' , $match['id'])->first()){
-                            $time = microtime(true);
+                        $time = microtime(true);
                         foreach($ex_match->odds as $k_ex_odd => $odd){
                             foreach($odds as $o_key => $new_odd){
                                 if($odd->bookmaker->provider_slug === $new_odd['id']) break;
                             }
-                            $indexes_odds = [];
-                            foreach ($new_odd['outcomes'] as $out_k => $outcome){
-                                $indexes_odds[$outcome['type']] = $outcome['opening_odds'];
-                            }
+                            if(isset($new_odd) && isset($new_odd['outcomes'])){
+                                $indexes_odds = [];
+                                foreach ($new_odd['outcomes'] as $out_k => $outcome){
+                                    $indexes_odds[$outcome['type']] = $outcome['opening_odds'];
+                                }
 
-                            $odd->update([
-                                'win_home'      => $indexes_odds['home'],
-                                'win_guest'     => $indexes_odds['away'],
-                                'draw'          => $indexes_odds['draw'],
-                                'last_update'   => $match['markets_last_updated'],
-                            ]);
+                                $odd->update([
+                                    'win_home'      => $indexes_odds['home'],
+                                    'win_guest'     => $indexes_odds['away'],
+                                    'draw'          => $indexes_odds['draw'],
+                                    'last_update'   => $match['markets_last_updated'],
+                                ]);
+                            }else{
+                                dd($new_odd);
+                            }
                         }
                         continue;
                     }
@@ -351,6 +355,7 @@ class SportTraderService extends ApiService implements OddApiService {
                     $provider_ids[] = $match['id'];
                     if($odds){
                         foreach($odds as $o_key => $odd){
+                            if(isset($odd['outcomes'])){
                             $indexes_odds = [];
                             foreach ($odd['outcomes'] as $out_k => $outcome){
                                 $indexes_odds[$outcome['type']] = $outcome['opening_odds'];
@@ -366,6 +371,8 @@ class SportTraderService extends ApiService implements OddApiService {
                                 'created_at'    => $cr_date,
                                 'updated_at'    => $cr_date
                             ];
+
+                            }
                         }
                     }
                 }
