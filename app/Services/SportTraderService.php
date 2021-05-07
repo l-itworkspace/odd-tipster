@@ -345,8 +345,6 @@ class SportTraderService extends ApiService implements OddApiService {
                                     'draw'          => $indexes_odds['draw'],
                                     'last_update'   => $match['markets_last_updated'],
                                 ]);
-                            }else{
-                                dd($new_odd);
                             }
                         }
                         continue;
