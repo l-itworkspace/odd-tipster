@@ -31,8 +31,21 @@ return [
     ],
 
     'odd' => [
-        'key' => '950ee564b288a68ad4c893f6b544b091',
+        'api_key' => '950ee564b288a68ad4c893f6b544b091',
         'api_path' => 'https://api.the-odds-api.com/v3/',
+    ],
+
+    'sport_traders' => [
+        'api_path'    => 'https://api.sportradar.com/oddscomparison-rowt1/en/eu/',
+        'schedule'    => 'https://schema.sportradar.com/',
+        'api_key'     => 'w7cdhmkgk58vbwa25v47qpbb'
+    ],
+
+    'pinnacle' => [
+        'api_path' => 'https://guest.api.arcadia.pinnacle.com/0.1',
+        'login'    => 'AH1351083',
+        'password' => 'mF!7J*WErR',
+        'encode_type' => 'base64'
     ]
 
 ];

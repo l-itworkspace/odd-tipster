@@ -2,13 +2,14 @@
 
 namespace App\Jobs;
 
-use App\Services\OddService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+
+use App\Services\SportTraderService;
 
 class RefreshMathces implements ShouldQueue
 {
@@ -31,7 +32,7 @@ class RefreshMathces implements ShouldQueue
      */
     public function handle()
     {
-        $odd_service = new OddService(config('services.odd'));
-        $odd_service->updateMatches();
+        $odd_service = new SportTraderService(config('services.sport_traders'));
+        $odd_service->insertMatches();
     }
 }

@@ -15,11 +15,11 @@ class CreateSportTypesTable extends Migration
     {
         Schema::create('sport_types', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 200);
-            $table->string('type', 100)->unique();
-            $table->string('group', 191);
+            $table->string('name', 100);
+            $table->string('slug' , 100)->unique();
+            $table->string('provider_slug' , 50)->unique();
+            $table->tinyInteger('type')->default(1);
             $table->boolean('active')->default(true);
-            $table->string('details', 255);
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->timestamps();
         });

@@ -4,3 +4,19 @@
 .scrollable-x{
     overflow-x: auto;
 }
+
+ul#sidebarCollapse > li:first-child{
+    margin-top: 0 !important;
+}
+
+ul#sidebarCollapse > li:last-child{
+    margin-bottom: 0 !important;
+}
+
+.child-p-03 > *{
+    padding: 0.3rem !important;
+}
+
+.white-space-nowrap{
+    white-space: nowrap;
+}

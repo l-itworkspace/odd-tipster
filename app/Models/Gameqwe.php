@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Game extends Model
+class Gameqwe extends Model
 {
     use HasFactory;
+
+    protected $table = 'matches';
 
     /**
      * The attributes that are mass assignable.
@@ -15,12 +17,10 @@ class Game extends Model
      * @var array
      */
     protected $fillable = [
-        'provider_slug',
-        'sport_id',
-        'tournament_id',
+        'provider_id',
+        'sport_type',
         'home_team',
         'guest_team',
-        'location',
         'start_time'
     ];
 
@@ -34,6 +34,14 @@ class Game extends Model
 
     public function odd(){
         return $this->hasOne('App\Models\Odd' , 'match_id' , 'id');
+    }
+
+    public function sport_type(){
+        return $this->hasOne('App\Models\SportTypes' , 'type' , 'sport_type');
+    }
+
+    public function sport_type_part(){
+        return $this->sport_type()->select('name' , 'group' , 'details');
     }
 
 }

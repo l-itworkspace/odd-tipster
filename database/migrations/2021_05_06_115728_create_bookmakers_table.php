@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class DeleteMe extends Migration
+class CreateBookmakersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,12 @@ class DeleteMe extends Migration
      */
     public function up()
     {
-        Schema::create('delete_me', function (Blueprint $table) {
-            $table->string('referer' )->nullable();
-            $table->string('ip_address')->nullable();
-            $table->string('origin')->nullable();
+        Schema::create('bookmakers', function (Blueprint $table) {
+            $table->id();
+            $table->string('provider_slug');
+            $table->string('name');
+            $table->string('link')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -27,6 +29,6 @@ class DeleteMe extends Migration
      */
     public function down()
     {
-        //
+        Schema::dropIfExists('bookmakers');
     }
 }

@@ -19,3 +19,9 @@ if (!function_exists('concatForUrls')) {
         return trim($url , '/');
     }
 }
+
+if(!function_exists('uniqueid')){
+    function getUnique($size = 5){
+        return substr( uniqid(), -$size);
+    }
+}

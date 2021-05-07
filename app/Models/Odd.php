@@ -28,9 +28,12 @@ class Odd extends Model
         "last_update" => "date:d , H:i",
     ];
 
+    public function game(){
+        return $this->hasOne('App\Models\Game', 'id' , 'match_id');
+    }
 
-    public function Game(){
-        $this->hasOne('App\Models\Game' , 'id' , 'match_id');
+    public function bookmaker(){
+        return $this->hasOne('App\Models\Bookmakers', 'name' , 'site_nickname');
     }
 
 }

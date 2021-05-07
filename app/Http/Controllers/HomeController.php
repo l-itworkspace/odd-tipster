@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 
+use App\Services\SportTraderService;
 use Illuminate\Http\Request;
 use App\Http\Requests\GetOddsRequest;
 
 
 // Services
-use App\Services\OddService;
-
-
+use App\Services\PinnacleService;
 
 
 class HomeController extends Controller
@@ -25,7 +24,7 @@ class HomeController extends Controller
     public function __construct()
     {
         $this->middleware('auth')->only('index');
-        $this->odd_service = new OddService(config('services.odd'));
+        $this->odd_service = new SportTraderService(config('services.sport_traders'));
     }
 
     /**
@@ -41,31 +40,40 @@ class HomeController extends Controller
 
     public function home(Request $req)
     {
-        $sport_types = $this->odd_service->getSportTypes(['db' => true]);
 
-        $select = [
-            'db'=> [
-                'with_odd' => true,
+        $selects = [
+            'sport_types' => [
+                'db' => true,
+            ],
+            'tournaments' => [
+                'db' => [
+                    'whereHas' => 'games'
+                ]
             ]
         ];
 
-        $matches = $this->odd_service->getMatches($select , $req->sport_type);
+        $sport_types = $this->odd_service->getSportTypes($selects['sport_types']);
 
-        return view('welcome', compact(['sport_types' , 'matches']));
+        if($req->has('update-full')){
+            $this->odd_service->insertMatches();
+            $this->odd_service->insertBookmakers();
+        }
+
+        if($req->cat_id){
+            $selects['tournaments']['db']['wheres'] = [
+                ['category_id' , '=' , $req->cat_id]
+            ];
+        }
+
+        $tournaments = $this->odd_service->getTournaments($selects['tournaments']);
+
+        return view('welcome', compact(['sport_types' , 'tournaments']));
     }
 
     public function getOdds(GetOddsRequest $req){
         $matches = $this->odd_service->getOddsByMatchId($req->match_id , [['site_slug' , '<>' , $req->showed_site]]);
 
         return ['success' => true , 'data' => $matches];
-    }
-
-    public function checkIp(Request $req){
-        \DB::table('delete_me')->insert([
-            'referer' => $req->server('HTTP_REFERER'),
-            'origin'  => $req->server('origin'),
-            'ip_address' => $req->ip()
-        ]);
     }
 
 }

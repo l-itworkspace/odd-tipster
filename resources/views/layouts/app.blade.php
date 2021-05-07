@@ -88,20 +88,30 @@
 
                         <div class="col-md-3">
                             @php
-                                $request_sport_type = \Request::get('sport_type');
+                                $request_sport_type = \Request::get('sport_id');
+                                $request_cat_type = \Request::get('cat_id');
                             @endphp
-                            <a class="d-md-none list-group-item" data-toggle="collapse" href="#sidebarCollapse" role="button" aria-expanded="false" aria-controls="sidebarCollapse">Sport Types {{ $request_sport_type ? ' >> ' . ($sport_types->where('type' , $request_sport_type)->first() ? $sport_types->where('type' , $request_sport_type)->first()->details : '' )  : '' }}</a>
 
-                            <div id="sidebarCollapse" class="list-group collapse d-md-flex">
-                                @foreach($sport_types as $k =>$sport_type)
-                                    <a class="list-group-item {{ $request_sport_type === $sport_type->type ? 'active' : '' }}" href="{{  url('/' ) . '?' . http_build_query(['sport_type' => $sport_type->type]) }}" >
-                                        <span>{{ $sport_type->details  }}</span>
-                                    </a>
+                            <a class="d-md-none list-group-item" data-toggle="collapse" href="#sidebarCollapse" role="button" aria-expanded="false" aria-controls="sidebarCollapse">Sport Types {{ $request_sport_type ? ' >> ' . ($sport_types->where('slug' , $request_sport_type)->first() ? $sport_types->where('slug' , $request_sport_type)->first()->name : '' )  : '' }}</a>
+
+                            <ul id="sidebarCollapse" class="list-group list-unstyled collapse d-md-flex">
+                                @foreach($sport_types->where('parent_id' ,0) as $k => $sport_type)
+                                    <li class="my-1">
+                                        <a href="#cat-{{ $sport_type->slug }}" aria-expanded="false" data-toggle="collapse" class="rounded-top px-2 py-1 dropdown-toggle list-group-item collapsed" >
+                                            <span>{{ strtoupper($sport_type->name)  }}</span>
+                                        </a>
+                                        <ul class="collapse list-unstyled {{  $request_sport_type == $sport_type->id ? 'show' : '' }}" id="cat-{{ $sport_type->slug }}" >
+                                            @foreach($sport_types->where('parent_id' , $sport_type->id) as $c_k => $category)
+                                                <a class="list-group-item px-2 py-1 list-group-item collapsed {{ $request_cat_type == $category->id ? 'active' : '' }}" href="{{  url('/' ) . '?' . http_build_query(['sport_id' => $sport_type->id , 'cat_id' => $category->id]) }}" >{{ $category->name }}</a>
+                                            @endforeach
+                                        </ul>
+                                    </li>
+
                                 @endforeach
                                 @if(!count($sport_types))
                                     <a class="list-group-item"><span>Sorry ..</span></a>
                                 @endif
-                            </div>
+                            </ul>
                         </div>
                         <div class="col-md-9 mt-3 mt-md-0">
                             @yield('content')

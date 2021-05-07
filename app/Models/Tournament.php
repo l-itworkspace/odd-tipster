@@ -5,12 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SportTypes extends Model
+class Tournament extends Model
 {
     use HasFactory;
-
-    const TYPE_SPORT    = 1;
-    const TYPE_CATEGORY = 0;
 
     /**
      * The attributes that are mass assignable.
@@ -18,11 +15,17 @@ class SportTypes extends Model
      * @var array
      */
     protected $fillable = [
+        'category_id',
         'name',
-        'slug',
-        'active',
         'provider_slug',
-        'parent_id',
-        'type'
     ];
+
+    public function games(){
+        return $this->hasMany('App\Models\Game','tournament_id' , 'id');
+    }
+
+    public function weekGames(){
+        return $this->hasMany('App\Models\Game','tournament_id' , 'id');
+    }
+
 }

@@ -21,7 +21,7 @@ class OddService extends ApiService
         $types_response = [];
 
         if ((isset($get_all['api']) && $get_all['api']) || !$get_all) {
-            $types_response['api'] = $this->withApiToken('get', 'sports');
+            $types_response['api'] = $this->withApiToken('sports');
         }
 
         if ((isset($get_all['db']) && $get_all['db']) || !$get_all) {
@@ -80,7 +80,7 @@ class OddService extends ApiService
 
         if((isset($get_all['api']) && $get_all['api']) || !$get_all){
 
-            $sport_types = $this->withApiToken('get', 'odds', ['sport' => $sport_type, 'region' => 'uk' ]);
+            $sport_types = $this->withApiToken('odds', 'get', ['sport' => $sport_type, 'region' => 'uk' ]);
 
             if($sport_types['success']){
                 $matches_response['api'] = $sport_types['data'];
@@ -97,7 +97,7 @@ class OddService extends ApiService
                $selects = $get_all['db']['select'];
            }
 
-           $matches = \App\Models\Game::select($selects);
+           $matches = \App\Models\Gameqwe::select($selects);
 
            if(isset($get_all['db']['where'])){
                $matches->where($get_all['db']['where']);
@@ -212,11 +212,10 @@ class OddService extends ApiService
 
                     }
                 }
-
             }
 
-            if(\App\Models\Game::insert($inserts)){
-                $insert_ids = \App\Models\Game::whereIn('provider_id' ,$provider_ids )->get(['id' , 'provider_id'])->toArray();
+            if(\App\Models\Gameqwe::insert($inserts)){
+                $insert_ids = Gameqwe::whereIn('provider_id' ,$provider_ids )->get(['id' , 'provider_id'])->toArray();
                 $insert_odds = [];
                 foreach ($odds as $o_key => $odd){
                     foreach ($insert_ids as $i_key => $insert_data){
@@ -241,15 +240,11 @@ class OddService extends ApiService
 
     public function getOddsByMatchId($id , array $where = []){
         $odds = \App\Models\Odd::where('match_id' , $id );
+
         if($where){
             $odds->where($where);
         }
 
         return $odds->get(['site_slug' , 'site_nickname' , 'win_home' , 'win_guest' , 'draw' , 'last_update']);
-    }
-
-    public function withApiToken($method, $url, $data = [])
-    {
-        return $this->requestTo($method, $url, array_merge($data, ['apiKey' => $this->credentials['key']]), true);
     }
 }

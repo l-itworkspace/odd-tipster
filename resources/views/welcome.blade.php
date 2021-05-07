@@ -8,8 +8,11 @@
             <h1>
                 @if(isset($request_sport_type))
                     $request_sport_type
-                @elseif(\Request::get('sport_type') && $sport_types->where('type' ,\Request::get('sport_type'))->first())
-                    {{ $sport_types->where('type' ,\Request::get('sport_type'))->first()->details }}
+                @elseif(\Request::get('sport_id') && $sport_types->where('id' ,\Request::get('sport_id'))->first())
+                    {{ $sport_types->where('id' ,\Request::get('sport_id'))->first()->name }}
+                    @if(\Request::get('cat_id') && $sport_types->where('id' ,\Request::get('cat_id'))->first())
+                        <small> > {{  $sport_types->where('id' ,\Request::get('cat_id'))->first()->name }}</small>
+                    @endif
                 @else
                     All
                 @endif
@@ -17,54 +20,40 @@
         </div>
         <div class="card-body pb-0 scrollable-x">
             <table class="table mb-0" >
-                <thead>
-                    <tr>
-                        <td>Teams</td>
-                        <td>W1</td>
-                        <td>Draw</td>
-                        <td>W2</td>
-                        <td class="d-none d-sm-table-cell">Website</td>
-                        <td class="d-none d-sm-table-cell">Start</td>
-                    </tr>
-                </thead>
+{{--                <thead>--}}
+{{--                    <tr>--}}
+{{--                        <td>Teams</td>--}}
+{{--                        <td>W1</td>--}}
+{{--                        <td>Draw</td>--}}
+{{--                        <td>W2</td>--}}
+{{--                        <td class="d-none d-sm-table-cell">Website</td>--}}
+{{--                        <td class="d-none d-sm-table-cell">Start</td>--}}
+{{--                    </tr>--}}
+{{--                </thead>--}}
                 <tbody>
-                @foreach($matches as $k => $match)
 
-                    @php
-                        $has_odd = $match->odd;
-                        $auth_user = auth()->user();
-                    @endphp
-                    <tr data-id="{{ $match->id }}" data-odd-id="{{ $has_odd ? $has_odd->site_slug : '' }}">
-                        <td>
-                            <span>{{ $match->home_team  }}</span> - <span>{{  $match->guest_team }}</span>
-                        </td>
-                        <td>
-                             <span class="{{  $auth_user ? 'cursor-pointer text-info' : '' }}">{{ $match->odd ? $match->odd->win_home : 'X' }}</span>
-                        </td>
-                        <td>
-                            <span class="{{  $auth_user ? 'cursor-pointer text-info' : '' }}">
-                                {{ $has_odd->draw ?? 'X' }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="{{  $auth_user ? 'cursor-pointer text-info' : '' }}">{{ $has_odd ? $has_odd->win_guest : 'X' }}</span>
-                        </td>
-                        <td class="d-none d-sm-table-cell">
-                            <span>{{ $has_odd ? $has_odd->site_nickname : 'X'}}</span>
-                        </td>
-                        <td class="d-none d-sm-table-cell">
-                            <span>{{ date('d , H:i' , strtotime($match->start_time)) }}</span>
-                        </td>
+                @php
+                    $auth_user = auth()->user();
+                @endphp
+
+                @foreach($tournaments as $k => $tournament)
+                    <tr data-id="{{ $tournament->id }}" data-odd-id="">
+                        <td colspan="6" class="bg-info text-white"><span>{{ $tournament->name }}</span></td>
                     </tr>
-                    <tr class="details">
-                        <td colspan="7" class="border-top-0 text-center">
-                            <a class="" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample-{{ $match->id }}">
-                                Details
-                            </a>
-                        </td>
-                    </tr>
+                    @if($tournament->games)
+                        @foreach($tournament->games as $k => $game)
+                            <tr class="child-p-03">
+                                <td><span>{{ $game->home_team  }} - {{ $game->guest_team  }}</span></td>
+                                <td><span>{{ $game->odd->win_home ?? 'X'  }}</span></td>
+                                <td><span>{{ $game->odd->win_guest ?? 'X' }}</span></td>
+                                <td><span>{{ $game->odd->win_guest ?? 'X' }}</span></td>
+                                <td class="d-none d-sm-table-cell"><span>{{ $game->location ?: ''  }}</span></td>
+                                <td class="white-space-nowrap"><span>{{ date('d , H:i' , strtotime($game->start_time))  }}</span></td>
+                            </tr>
+                        @endforeach
+                    @endif
                 @endforeach
-                @if(!count($matches))
+                @if(!count($tournaments))
                     <tr><td colspan="7" class="text-center">Empty Data</td></tr>
                 @endif
                 </tbody>
@@ -72,7 +61,7 @@
         </div>
         </div>
         <div class="d-flex justify-content-center mt-3">
-            {{  $matches->links() }}
+{{--            {{  $matches->links() }}--}}
         </div>
     </div>
 @endsection

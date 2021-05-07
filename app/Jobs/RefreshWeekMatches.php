@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Services\SportTraderService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -9,11 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-
-use App\Services\SportTraderService;
-
-
-class RefreshExistsCategories implements ShouldQueue
+class RefreshWeekMatches implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -34,15 +31,12 @@ class RefreshExistsCategories implements ShouldQueue
      */
     public function handle()
     {
-        $odd_service = new SportTraderService(config('services.sport_traders'));
-        $all_types =  $odd_service->insertSportTypes(true);
-        if (isset($all_types['success']) && $all_types['success']) {
-            \Log::info('Molodes');
-        } else {
-            \Log::info('Cron Job RefreshExists has error');
-            if (isset($all_types['message'])) {
-                \Log::info($all_types['message']);
-            }
-        }
+       $odd_service = new SportTraderService(config('services.sport_traders'));
+       $date = date('Y-m-d' , strtotime('next monday'));
+       $next_date = date('Y-m-d');
+       while($next_date != $date){
+           $odd_service->insertMatches($next_date);
+           $next_date = date('Y-m-d' , (strtotime($next_date) + 86400));
+       }
     }
 }
