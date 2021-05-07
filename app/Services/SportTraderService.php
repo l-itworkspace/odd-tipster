@@ -316,7 +316,9 @@ class SportTraderService extends ApiService implements OddApiService {
                         'home_team'     => $match['competitors'][$index_home]['name'],
                         'guest_team'    => $match['competitors'][!$index_home]['name']
                     ];
-
+                    if(!isset($match['markets'])){
+                        continue;
+                    }
                     $odds = false;
                     foreach ($match['markets'] as $m_key => $market){
                         if($market['name'] === '3way'){
