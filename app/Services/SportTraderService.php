@@ -312,7 +312,7 @@ class SportTraderService extends ApiService implements OddApiService {
                         'provider_slug' => $match['id'],
                         'tournament_id' => $tournament->id,
                         'location'      => $match['venue']['name'] ?? null,
-                        'start_time'    => $match['scheduled'],
+                        'start_time'    => date('Y-m-d H:i:s' , strtotime($match['scheduled'])),
                         'home_team'     => $match['competitors'][$index_home]['name'],
                         'guest_team'    => $match['competitors'][!$index_home]['name']
                     ];
