@@ -369,7 +369,7 @@ class SportTraderService extends ApiService implements OddApiService {
                                 'win_home'      => $indexes_odds['home'],
                                 'win_guest'     => $indexes_odds['away'],
                                 'draw'          => $indexes_odds['draw'],
-                                'last_update'   => $match['markets_last_updated'],
+                                'last_update'   => date('Y-m-d H:i:s' , strtotime($match['markets_last_updated'])),
                                 'created_at'    => $cr_date,
                                 'updated_at'    => $cr_date
                             ];
