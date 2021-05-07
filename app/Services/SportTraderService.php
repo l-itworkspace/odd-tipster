@@ -272,7 +272,6 @@ class SportTraderService extends ApiService implements OddApiService {
                 'db' => [
                     'wheres' => [
                         ['active' ,'=',1],
-                        ['type' , '=' , SportTypes::TYPE_SPORT]
                     ],
                     'select' => ['id' , 'provider_slug']
                 ]
@@ -292,7 +291,7 @@ class SportTraderService extends ApiService implements OddApiService {
 
         $time = microtime(true);
         $cr_date = date('Y-m-d H:i:s');
-        foreach ($sport_types as $sport_k => $sport_type){
+        foreach ($sport_types->where('type' , SportTypes::TYPE_SPORT) as $sport_k => $sport_type){
             if($matches = $this->getMatches($sport_type->provider_slug , ($date ?: date('Y-m-d')))){
                 \Log::info('After get matches' . $date);
                 $inserts     = [];
@@ -302,9 +301,43 @@ class SportTraderService extends ApiService implements OddApiService {
 
                     if($match['status'] === 'closed') continue;
 
+
+
                     $tournament = $tournaments->where('provider_slug' , $match['tournament']['id'])->first();
 
-                    if(!$tournament) continue;
+                    if(!$tournament){
+                        $type_sport = $sport_types->where('provider_slug' , $match['tournament']['sport']['id'])->first();
+
+                        if(!$type_sport){
+                            $slug  = \Str::slug($match['tournament']['sport']['name']) . '-';
+                            SportTypes::create([
+                                'name'          => $match['tournament']['sport']['name'],
+                                'provider_slug' => $match['tournament']['sport']['id'],
+                                'slug'          => $slug  . getUnique(100 - strlen($slug))
+                            ]);
+                        }
+
+                        $category = $sport_types->where('provider_slug' , $match['tournament']['category']['id'])->first();
+
+                        if(!$category){
+                            $parent_id = $type_sport->id ?? SportTypes::where('provider_slug' , $match['tournament']['sport']['id'])->first()->id;
+                            $slug  = \Str::slug($match['tournament']['category']['name']) . '-';
+                            SportTypes::create([
+                                'parent_id' => $parent_id,
+                                'name'      =>  $match['tournament']['category']['name'],
+                                'slug'      => $slug  . getUnique(100 - strlen($slug)),
+                                'provider_slug' =>  $match['tournament']['category']['id'],
+                                'type'         => SportTypes::TYPE_CATEGORY
+                            ]);
+                        }
+                        $slug  = \Str::slug($match['tournament']['name']) . '-';
+                        Tournament::create([
+                            'name' => $match['tournament']['name'],
+                            'slug' => $slug  . getUnique(100 - strlen($slug)),
+                            'provider_slug' => $match['tournament']['id'],
+                            'category_id'   => SportTypes::where('provider_slug' , $match['tournament']['category']['id'])->first()->id,
+                        ]);
+                    }
 
                     $index_home = !array_search('home' , $match['competitors'][0]);
 
