@@ -18,6 +18,7 @@ class Game extends Model
         'provider_slug',
         'sport_id',
         'tournament_id',
+        'category_id',
         'home_team',
         'guest_team',
         'location',

@@ -9,20 +9,21 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-use App\Services\SportTraderService;
-
-class RefreshMathces implements ShouldQueue
+class InsertMatches implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    private $matches,$service;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($matches , $service)
     {
-        //
+       $this->matches = $matches;
+       $this->service = $service;
     }
 
     /**
@@ -32,7 +33,6 @@ class RefreshMathces implements ShouldQueue
      */
     public function handle()
     {
-        $odd_service = new SportTraderService(config('services.sport_traders'));
-        $odd_service->insertMatchesBefore();
+        $this->service->insertMatchesAfter($this->matches);
     }
 }

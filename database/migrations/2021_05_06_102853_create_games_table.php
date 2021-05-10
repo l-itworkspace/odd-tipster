@@ -17,6 +17,7 @@ class CreateGamesTable extends Migration
             $table->id();
             $table->string('provider_slug' , 50);
             $table->foreignId('tournament_id')->constrained('tournaments')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('sport_types')->onDelete('cascade');
             $table->string('home_team' , 190);
             $table->string('guest_team' , 190);
             $table->string('location')->nullable();

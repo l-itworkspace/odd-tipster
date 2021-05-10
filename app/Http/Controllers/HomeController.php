@@ -40,10 +40,18 @@ class HomeController extends Controller
 
     public function home(Request $req)
     {
-
+        $date = date('Y-m-d');
         $selects = [
             'sport_types' => [
-                'db' => true,
+                'db' =>[
+                    'whereHas' => 'categories.gamesToday',
+                    'with' => ['categories' => function ($q){
+                        $q->has('gamesToday');
+                    }],
+                    'where' => [
+                        ['parent_id'  , '=' , 0 ]
+                    ]
+                ]
             ],
             'tournaments' => [
                 'db' => [
@@ -53,11 +61,9 @@ class HomeController extends Controller
         ];
 
         $sport_types = $this->odd_service->getSportTypes($selects['sport_types']);
-
         if($req->has('update-full')){
-//            $this->odd_service->insertBookmakers();
-//            $this->odd_service->insertTournaments();
-            $this->odd_service->insertMatches();
+//            $this->odd_service->insertSportTypes();
+            $this->odd_service->insertBookmakers();
         }
 
         if($req->cat_id){

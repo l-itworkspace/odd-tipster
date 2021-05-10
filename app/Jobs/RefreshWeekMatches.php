@@ -35,7 +35,7 @@ class RefreshWeekMatches implements ShouldQueue
        $date = date('Y-m-d' , strtotime('next monday'));
        $next_date = date('Y-m-d');
        while($next_date != $date){
-           $odd_service->insertMatches($next_date);
+           $odd_service->insertMatchesBefore($next_date);
            $next_date = date('Y-m-d' , (strtotime($next_date) + 86400));
        }
     }

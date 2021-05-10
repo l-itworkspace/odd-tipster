@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\InsertNotExistsTournaments;
 use App\Models\Bookmakers;
 use App\Models\Game;
 use App\Models\Odd;
@@ -144,7 +145,16 @@ class SportTraderService extends ApiService implements OddApiService {
             if(isset($get_all['db']['wheres']) && $get_all['db']['wheres']){
                 $wheres = $get_all['db']['wheres'];
             }
-            $types_response['db'] = SportTypes::where($wheres)->orderBy('parent_id')->get($select);
+            $sport_types_db = SportTypes::where($wheres);
+            if(isset($get_all['db']['whereHas'])){
+                $sport_types_db->whereHas($get_all['db']['whereHas']);
+            }
+
+            if(isset($get_all['db']['with'])){
+                $sport_types_db->with($get_all['db']['with']);
+            }
+
+            $types_response['db'] = $sport_types_db->orderBy('parent_id')->get($select);
         }
 
         if ($get_all) {
@@ -157,6 +167,7 @@ class SportTraderService extends ApiService implements OddApiService {
     public function insertSportTypes($call_categories = false){
 
         $sport_types = $this->getSportTypes();
+
         $this->sport_types = $sport_types;
         $inserts = [];
         $cr_date = date('Y-m-d');
@@ -247,12 +258,14 @@ class SportTraderService extends ApiService implements OddApiService {
 
     public function getMatchesDB($get_all = []){
         $selects = ['*'];
-
+        $game = Game::with(['odds.bookmaker']);
         if($get_all){
-
+            if(isset($get_all['where'])){
+                $game->where($get_all['where']);
+            }
         }
 
-        return Game::with(['odds.bookmaker'])->select($selects)->get();
+        return $game->select($selects)->get();
     }
 
     public function getMatches($sport_slug = null , $date = false){
@@ -266,178 +279,141 @@ class SportTraderService extends ApiService implements OddApiService {
         return false;
     }
 
-    public function insertMatches( $date = false ){
-        $selects = [
-            'sport_types' => [
+    public function insertMatchesBefore( $date = false ){
+        $select_sport_types = [
                 'db' => [
                     'wheres' => [
                         ['active' ,'=',1],
                     ],
-                    'select' => ['id' , 'provider_slug']
+                    'select' => ['id' , 'provider_slug' , 'type']
                 ]
-            ],
-            'tournaments' => [
-                'db' => [
-                    'select' => ['id','provider_slug']
-                ]
-            ],
-            'matches' => ['db' => true]
         ];
 
-        $sport_types = $this->getSportTypes($selects['sport_types']);
-        $tournaments = $this->getTournaments($selects['tournaments']);
+        $sport_types = $this->getSportTypes($select_sport_types);
 
-        $exists_matches  = $this->getMatchesDB();
-
-        $time = microtime(true);
-        $cr_date = date('Y-m-d H:i:s');
-        foreach ($sport_types->where('type' , SportTypes::TYPE_SPORT) as $sport_k => $sport_type){
+        $sport_types_sport = $sport_types->where('type' , SportTypes::TYPE_SPORT);
+        $insert_matches = [];
+        foreach ($sport_types_sport as $sport_k => $sport_type){
             if($matches = $this->getMatches($sport_type->provider_slug , ($date ?: date('Y-m-d')))){
                 \Log::info('After get matches' . $date);
-                $inserts     = [];
-                $ods_inserts = [];
-                $provider_ids =[];
                 foreach ($matches as $m_k => $match){
 
                     if($match['status'] === 'closed') continue;
 
+                    $insert_matches[] = $match;
+                }
+            }
+        }
+        if($insert_matches){
+            InsertNotExistsTournaments::dispatch($insert_matches , $sport_types);
+        }
+    }
 
+    public function insertMatchesAfter($matches){
+        $ex_matches = $this->getMatchesDB();
+        $insert_games = [];
+        $tournaments = $this->getTournaments([
+            'db' => [
+                'select' => ['id','provider_slug' , 'category_id'],
+                'without_rel' => true
+            ]
+        ]);
 
-                    $tournament = $tournaments->where('provider_slug' , $match['tournament']['id'])->first();
+        $ods_inserts = [];
+        $cr_date = date('Y-m-d H:i:s');
+        foreach ($matches as $k => $match){
+            $odds = false;
+            if(isset($match['markets'])){
+                foreach ($match['markets'] as $m_key => $market){
+                    if($market['name'] === '3way'){
+                        $odds = $market['books'];
+                        break;
+                    }
+                }
+            }
 
-                    if(!$tournament){
-                        $type_sport = $sport_types->where('provider_slug' , $match['tournament']['sport']['id'])->first();
+            if($ex_match = $ex_matches->where('provider_slug' , $match['id'])->first() ){
+                foreach($ex_match->odds as $k_ex_odd => $odd){
+                    if($odds){
 
-                        if(!$type_sport){
-                            $slug  = \Str::slug($match['tournament']['sport']['name']) . '-';
-                            SportTypes::create([
-                                'name'          => $match['tournament']['sport']['name'],
-                                'provider_slug' => $match['tournament']['sport']['id'],
-                                'slug'          => $slug  . getUnique(100 - strlen($slug))
-                            ]);
+                    foreach($odds as $o_key => $new_odd){
+                        if($odd->bookmaker->provider_slug === $new_odd['id']) break;
+                    }
+                    if(isset($new_odd) && isset($new_odd['outcomes'])){
+                        $indexes_odds = [];
+                        foreach ($new_odd['outcomes'] as $out_k => $outcome){
+                            $indexes_odds[$outcome['type']] = $outcome['opening_odds'];
                         }
 
-                        $category = $sport_types->where('provider_slug' , $match['tournament']['category']['id'])->first();
-
-                        if(!$category){
-                            $parent_id = $type_sport->id ?? SportTypes::where('provider_slug' , $match['tournament']['sport']['id'])->first()->id;
-                            $slug  = \Str::slug($match['tournament']['category']['name']) . '-';
-                            SportTypes::create([
-                                'parent_id' => $parent_id,
-                                'name'      =>  $match['tournament']['category']['name'],
-                                'slug'      => $slug  . getUnique(100 - strlen($slug)),
-                                'provider_slug' =>  $match['tournament']['category']['id'],
-                                'type'         => SportTypes::TYPE_CATEGORY
-                            ]);
-                        }
-                        $slug  = \Str::slug($match['tournament']['name']) . '-';
-                        Tournament::create([
-                            'name' => $match['tournament']['name'],
-                            'slug' => $slug  . getUnique(100 - strlen($slug)),
-                            'provider_slug' => $match['tournament']['id'],
-                            'category_id'   => SportTypes::where('provider_slug' , $match['tournament']['category']['id'])->first()->id,
+                        $odd->update([
+                            'win_home'      => $indexes_odds['home'],
+                            'win_guest'     => $indexes_odds['away'],
+                            'draw'          => $indexes_odds['draw'],
+                            'last_update'   => date('Y-m-d H:i:s' , strtotime($match['markets_last_updated'])),
                         ]);
                     }
+                    }
+                }
+            }else{
+                if(arraySearch($match['id'] ,$insert_games , 'provider_slug') === false){
 
-                    $index_home = !array_search('home' , $match['competitors'][0]);
-
-                    $insert_or_update = [
+                    $index_home = arraySearch('home' , $match['competitors'] , 'qualifier');
+                    $tournament = $tournaments->where('provider_slug' , $match['tournament']['id'])->first();
+                    $insert_games[] = [
                         'provider_slug' => $match['id'],
                         'tournament_id' => $tournament->id,
-                        'location'      => $match['venue']['name'] ?? null,
-                        'start_time'    => date('Y-m-d H:i:s' , strtotime($match['scheduled'])),
+                        'category_id'   => $tournament->category_id,
+                        'location'      => isset($match['venue']['name']) ? $match['venue']['name'] : '',
                         'home_team'     => $match['competitors'][$index_home]['name'],
-                        'guest_team'    => $match['competitors'][!$index_home]['name']
+                        'guest_team'    => $match['competitors'][!$index_home]['name'],
+                        'start_time'    => date('Y-m-d H:i:s' , strtotime($match['scheduled'])),
+                        'created_at'    => $cr_date,
+                        'updated_at'    => $cr_date
                     ];
-                    if(!isset($match['markets'])){
-                        continue;
-                    }
-                    $odds = false;
-                    foreach ($match['markets'] as $m_key => $market){
-                        if($market['name'] === '3way'){
-                            $odds = $market['books'];
-                            break;
-                        }
-                    }
 
-                    if($ex_match = $exists_matches->where('provider_slug' , $match['id'])->first()){
-                        $time = microtime(true);
-                        foreach($ex_match->odds as $k_ex_odd => $odd){
-                            foreach($odds as $o_key => $new_odd){
-                                if($odd->bookmaker->provider_slug === $new_odd['id']) break;
-                            }
-                            if(isset($new_odd) && isset($new_odd['outcomes'])){
+                    if($odds){
+                        foreach($odds as $o_key => $odd){
+                            if(isset($odd['outcomes'])){
                                 $indexes_odds = [];
-                                foreach ($new_odd['outcomes'] as $out_k => $outcome){
+                                foreach ($odd['outcomes'] as $out_k => $outcome){
                                     $indexes_odds[$outcome['type']] = $outcome['opening_odds'];
                                 }
 
-                                $odd->update([
+                                $ods_inserts[] = [
+                                    'match_id'      => $match['id'],
+                                    'site_slug'     => \Str::slug($odd['name']),
+                                    'site_nickname' => $odd['name'],
                                     'win_home'      => $indexes_odds['home'],
                                     'win_guest'     => $indexes_odds['away'],
                                     'draw'          => $indexes_odds['draw'],
                                     'last_update'   => date('Y-m-d H:i:s' , strtotime($match['markets_last_updated'])),
-                                ]);
-                            }
-                        }
-                        continue;
-                    }
-
-                    $inserts[] = array_merge($insert_or_update , ['created_at' => $cr_date , 'updated_at' => $cr_date]);
-
-                    $provider_ids[] = $match['id'];
-                    if($odds){
-                        foreach($odds as $o_key => $odd){
-                            if(isset($odd['outcomes'])){
-                            $indexes_odds = [];
-                            foreach ($odd['outcomes'] as $out_k => $outcome){
-                                $indexes_odds[$outcome['type']] = $outcome['opening_odds'];
-                            }
-
-                            $ods_inserts[$match['id']][] = [
-                                'site_slug'     => \Str::slug($odd['name']),
-                                'site_nickname' => $odd['name'],
-                                'win_home'      => $indexes_odds['home'],
-                                'win_guest'     => $indexes_odds['away'],
-                                'draw'          => $indexes_odds['draw'],
-                                'last_update'   => date('Y-m-d H:i:s' , strtotime($match['markets_last_updated'])),
-                                'created_at'    => $cr_date,
-                                'updated_at'    => $cr_date
-                            ];
+                                    'created_at'    => $cr_date,
+                                    'updated_at'    => $cr_date
+                                ];
 
                             }
                         }
                     }
-                }
-                \Log::info('Before Insert' . $date);
-                if($inserts){
-                    if(Game::insert($inserts)){
-                        $insert_ids = Game::whereIn('provider_slug' ,$provider_ids )->get(['id' , 'provider_slug'])->toArray();
-                        $insert_odds = [];
-                        foreach ($ods_inserts as $o_key => $odd){
-                            foreach ($insert_ids as $i_key => $insert_data){
-                                if($insert_data['provider_slug'] === $o_key) break;
-                            }
-                            if(isset($insert_data)){
-                                foreach ($odd as $odd_key => $odd_insert){
-                                    $insert_odds[] = array_merge(['match_id' => $insert_data['id']] , $odd_insert);
-                                }
-                            }
-                        }
-                        Odd::insert($insert_odds);
-                    }else{
-                        if($date === '2021-05-07'){
-                            \Log::info('Insert Chexav');
-                        }
-                    }
-                }else{
-                    if($date === '2021-05-07'){
-                        \Log::info('Insert Chkar');
-                    }
+
                 }
             }
         }
+        if($insert_games){
+            if(Game::insert($insert_games)){
+                $ex_matches = $this->getMatchesDB([
+                    'where' => [
+                        ['created_at' , '=' , $cr_date]
+                    ]
+                ]);
+                foreach($ods_inserts as $odd_k => $odd){
+                    $ods_inserts[$odd_k]['match_id'] = $ex_matches->where('provider_slug' , $odd['match_id'])->first()->id;
+                }
+                Odd::insert($ods_inserts);
+            }
+        }
+
     }
+
 
     public function insertMatchesBySportSlug(){
 //
