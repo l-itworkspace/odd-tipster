@@ -17,6 +17,7 @@
                     All
                 @endif
             </h1>
+            <input type="date" name="date" value="{{ \Request::get('date') ?? date('Y-m-d') }}">
         </div>
         <div class="card-body pb-0 scrollable-x">
             <table class="table mb-0" >
@@ -65,4 +66,17 @@
         </div>
     </div>
 @endsection
-
+@section('script')
+    <script>
+        $(function (){
+            $('input[name="date"]').on('change' , function (){
+                let path = location.href.replace(/[\?\&]?date=.*/ , '');
+                if(path.search(/\?/) > -1){
+                    location.href = path + '&date=' + $(this).val();
+                }else{
+                    location.href = path + '?date=' + $(this).val();
+                }
+            });
+        })
+    </script>
+@endsection

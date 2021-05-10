@@ -28,4 +28,9 @@ class Tournament extends Model
         return $this->hasMany('App\Models\Game','tournament_id' , 'id');
     }
 
+    public function gamesToday(){
+        $date = \Request::get('date') ?? date('Y-m-d');
+        return $this->games()->whereBetween('created_at' , [$date . ' 00:00:00' ,  $date . ' 23:59:59'] );
+    }
+
 }

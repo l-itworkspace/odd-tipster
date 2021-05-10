@@ -40,7 +40,7 @@ class HomeController extends Controller
 
     public function home(Request $req)
     {
-        $date = date('Y-m-d');
+        $date = $req->date ?: date('Y-m-d');
         $selects = [
             'sport_types' => [
                 'db' =>[
@@ -55,7 +55,8 @@ class HomeController extends Controller
             ],
             'tournaments' => [
                 'db' => [
-                    'whereHas' => 'games'
+                    'whereHas' => 'gamesToday',
+                    'with'     => 'gamesToday'
                 ]
             ]
         ];
