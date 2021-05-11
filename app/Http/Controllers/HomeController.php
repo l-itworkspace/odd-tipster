@@ -49,7 +49,7 @@ class HomeController extends Controller
                 'db' =>[
                     'whereHas' => 'categories.gamesToday',
                     'with' => ['categories' => function ($q) use ($date){
-                        $q->has('games')->whereBetween('created_at' , [$date . ' 00:00:00' ,  $date . ' 23:59:59'] );
+                        $q->has('games')->whereBetween('start_time' , [$date . ' 00:00:00' ,  $date . ' 23:59:59'] );
                     }],
                     'where' => [
                         ['parent_id'  , '=' , 0 ]
@@ -60,7 +60,7 @@ class HomeController extends Controller
                 'db' => [
                     'whereHas' => 'gamesToday',
                     'with'     => ['games.odd' =>  function ($q) use ($date){
-                        $q->whereBetween('created_at' , [$date . ' 00:00:00' ,  $date . ' 23:59:59'] );
+                        $q->whereBetween('start_time' , [$date . ' 00:00:00' ,  $date . ' 23:59:59'] );
                     }]
                 ]
             ]
