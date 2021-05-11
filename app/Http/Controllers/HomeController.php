@@ -82,7 +82,7 @@ class HomeController extends Controller
         if($req->showDB){
             dd(\DB::getQueryLog());
         }
-        return view('welcome', compact(['sport_types' , 'tournaments']));
+        return view('welcome', compact(['sport_types' , 'tournaments' , 'date']));
     }
 
     public function getOdds(GetOddsRequest $req){
