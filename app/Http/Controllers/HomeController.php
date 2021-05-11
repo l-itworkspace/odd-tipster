@@ -48,9 +48,7 @@ class HomeController extends Controller
             'sport_types' => [
                 'db' =>[
                     'whereHas' => 'categories.gamesToday',
-                    'with' => ['categories' => function ($q) use ($date){
-                        $q->has('games')->whereBetween('start_time' , [$date . ' 00:00:00' ,  $date . ' 23:59:59'] );
-                    }],
+                    'with' => ['categories'],
                     'where' => [
                         ['parent_id'  , '=' , 0 ]
                     ]
@@ -59,14 +57,15 @@ class HomeController extends Controller
             'tournaments' => [
                 'db' => [
                     'whereHas' => 'gamesToday',
-                    'with'     => ['games.odd' =>  function ($q) use ($date){
-                        $q->whereBetween('start_time' , [$date . ' 00:00:00' ,  $date . ' 23:59:59'] );
+                    'with'     => ['games' =>  function ($q) use ($date){
+                        $q->whereBetween('start_time' , [$date . ' 00:00:00' ,  $date . ' 23:59:59'] )->with('odd');
                     }]
                 ]
             ]
         ];
 
         $sport_types = $this->odd_service->getSportTypes($selects['sport_types']);
+
         if($req->has('update-full')){
             $this->odd_service->insertTournaments();
 //            $this->odd_service->insertSportTypes();

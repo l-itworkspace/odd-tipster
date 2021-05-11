@@ -44,7 +44,7 @@ class SportTypes extends Model
 
     public function gamesToday(){
         $date = \Request::get('date') ?? date('Y-m-d');
-        return $this->games()->whereBetween('start_time' , [$date . ' 00:00:00' ,  $date . ' 23:59:59'] );
+        return $this->games()->whereBetween('games.start_time' , [$date . ' 00:00:00' ,  $date . ' 23:59:59'] );
     }
 
 }
