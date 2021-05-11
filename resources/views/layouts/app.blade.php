@@ -103,7 +103,9 @@
                                         </a>
                                         <ul class="collapse list-unstyled {{  $request_sport_type == $sport_type->id ? 'show' : '' }}" id="cat-{{ $sport_type->slug }}" >
                                             @foreach($sport_type->categories as $c_k => $category)
+                                                @if($category->games && $category->games->first())
                                                 <a class="list-group-item px-2 py-1 list-group-item collapsed {{ $request_cat_type == $category->id ? 'active' : '' }}" href="{{  url('/' ) . '?' . http_build_query(['sport_id' => $sport_type->id , 'cat_id' => $category->id]) }}" >{{ $category->name }}</a>
+                                                @endif
                                             @endforeach
                                         </ul>
                                     </li>

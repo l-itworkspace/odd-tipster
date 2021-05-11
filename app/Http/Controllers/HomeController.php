@@ -48,7 +48,7 @@ class HomeController extends Controller
             'sport_types' => [
                 'db' =>[
                     'whereHas' => 'categories.gamesToday',
-                    'with' => ['categories'],
+                    'with' => ['categories.games'],
                     'where' => [
                         ['parent_id'  , '=' , 0 ]
                     ]
