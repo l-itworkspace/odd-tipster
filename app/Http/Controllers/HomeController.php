@@ -40,6 +40,7 @@ class HomeController extends Controller
 
     public function home(Request $req)
     {
+        \DB::enableQueryLog();
         $date = $req->date ?: date('Y-m-d');
         $selects = [
             'sport_types' => [
@@ -76,7 +77,9 @@ class HomeController extends Controller
         }
 
         $tournaments = $this->odd_service->getTournaments($selects['tournaments']);
-
+        if($req->showDB){
+            dd(\DB::getQueryLog());
+        }
         return view('welcome', compact(['sport_types' , 'tournaments']));
     }
 
