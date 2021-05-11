@@ -40,7 +40,9 @@ class HomeController extends Controller
 
     public function home(Request $req)
     {
-        \DB::enableQueryLog();
+        if($req->showDB) {
+            \DB::enableQueryLog();
+        }
         $date = $req->date ?: date('Y-m-d');
         $selects = [
             'sport_types' => [

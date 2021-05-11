@@ -96,18 +96,18 @@
 
                             <ul id="sidebarCollapse" class="list-group list-unstyled collapse d-md-flex">
                                 @foreach($sport_types as $k => $sport_type)
+                                    @if($sport_type->categories && $sport_type->categories->first())
                                     <li class="my-1">
                                         <a href="#cat-{{ $sport_type->slug }}" aria-expanded="false" data-toggle="collapse" class="rounded-top px-2 py-1 dropdown-toggle list-group-item collapsed" >
                                             <span>{{ strtoupper($sport_type->name)  }}</span>
                                         </a>
-                                        @if($sport_type->categories)
                                         <ul class="collapse list-unstyled {{  $request_sport_type == $sport_type->id ? 'show' : '' }}" id="cat-{{ $sport_type->slug }}" >
                                             @foreach($sport_type->categories as $c_k => $category)
                                                 <a class="list-group-item px-2 py-1 list-group-item collapsed {{ $request_cat_type == $category->id ? 'active' : '' }}" href="{{  url('/' ) . '?' . http_build_query(['sport_id' => $sport_type->id , 'cat_id' => $category->id]) }}" >{{ $category->name }}</a>
                                             @endforeach
                                         </ul>
-                                        @endif
                                     </li>
+                                        @endif
                                 @endforeach
                                 @if(!count($sport_types))
                                     <a class="list-group-item"><span>Sorry ..</span></a>
