@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="card">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between">
             <h1>
                 @if(isset($request_sport_type))
                     $request_sport_type

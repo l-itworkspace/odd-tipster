@@ -40,30 +40,30 @@ class SportTraderService extends ApiService implements OddApiService {
         }
 
         if ((isset($get_all['db']) && $get_all['db']) || !$get_all) {
-            if(isset($get_all['db']['wheres']) && $get_all['db']['wheres']){
-                $wheres = $get_all['db']['wheres'];
-            }
-            if(isset($get_all['db']['select']) && $get_all['db']['select'] && is_array($get_all['db']['select'])){
-                $select = $get_all['db']['select'];
-            }
 
-            if(isset($wheres)){
-                //Yes you are rigth , But in heroku i cant write ::query();
-                if(isset($get_all['db']['whereHas'])){
-                    $types_response['db'] = Tournament::whereHas('games')->with('games.odd')->where($wheres)->get($select);
-                }else{
-                    $types_response['db'] = Tournament::with('games.odd')->where($wheres)->get($select);
-                }
+            if(isset($get_all['db']['without_rel'])){
+                $types_response['db'] = Tournament::select($select)->get();
             }else{
-                if(isset($get_all['db']['whereHas'])){
-                    $types_response['db'] = Tournament::whereHas('games')->with('games.odd')->get($select);
-                }else{
-                    if(isset($get_all['db']['without_rel'])){
-                        $types_response['db'] = Tournament::select($select)->get();
-                    }else{
-                        $types_response['db'] = Tournament::with('games.odd')->get($select);
-                    }
+                if(isset($get_all['db']['wheres']) && $get_all['db']['wheres']){
+                    $wheres = $get_all['db']['wheres'];
                 }
+                if(isset($get_all['db']['select']) && $get_all['db']['select'] && is_array($get_all['db']['select'])){
+                    $select = $get_all['db']['select'];
+                }
+                $t = Tournament::query();
+
+                if(isset($wheres)){
+                    $t->where($wheres);
+                }
+
+                if(isset($get_all['db']['whereHas'])){
+                    $t->whereHas($get_all['db']['whereHas']);
+                }
+
+                if(isset($get_all['db']['with'])){
+                    $t->with($get_all['db']['with']);
+                }
+                $types_response['db'] = $t->select($select)->get();
             }
         }
 

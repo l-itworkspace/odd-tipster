@@ -45,8 +45,8 @@ class HomeController extends Controller
             'sport_types' => [
                 'db' =>[
                     'whereHas' => 'categories.gamesToday',
-                    'with' => ['categories' => function ($q){
-                        $q->has('gamesToday');
+                    'with' => ['categories' => function ($q) use ($date){
+                        $q->has('games')->whereBetween('created_at' , [$date . ' 00:00:00' ,  $date . ' 23:59:59'] );
                     }],
                     'where' => [
                         ['parent_id'  , '=' , 0 ]
@@ -56,7 +56,9 @@ class HomeController extends Controller
             'tournaments' => [
                 'db' => [
                     'whereHas' => 'gamesToday',
-                    'with'     => 'gamesToday'
+                    'with'     => ['games' =>  function ($q) use ($date){
+                        $q->has('games')->whereBetween('created_at' , [$date . ' 00:00:00' ,  $date . ' 23:59:59'] );
+                    }]
                 ]
             ]
         ];
