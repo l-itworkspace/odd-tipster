@@ -56,7 +56,7 @@ class HomeController extends Controller
             'tournaments' => [
                 'db' => [
                     'whereHas' => 'gamesToday',
-                    'with'     => ['games' =>  function ($q) use ($date){
+                    'with'     => ['games.odd' =>  function ($q) use ($date){
                         $q->whereBetween('created_at' , [$date . ' 00:00:00' ,  $date . ' 23:59:59'] );
                     }]
                 ]
